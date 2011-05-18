@@ -96,7 +96,7 @@ class RelativeDeltaTest(unittest.TestCase):
     def testNextWenesdayNotToday(self):
         self.assertEqual(self.today+relativedelta(days=+1, weekday=WE),
                          date(2003, 9, 24))
-        
+
     def test15thISOYearWeek(self):
         self.assertEqual(date(2003, 1, 1) +
                          relativedelta(day=4, weeks=+14, weekday=MO(-1)),
@@ -3394,13 +3394,13 @@ class ParserTest(unittest.TestCase):
     def testLongMonth(self):
         self.assertEqual(parse("October", default=self.default),
                          datetime(2003, 10, 25))
-        
+
     def testZeroYear(self):
         self.assertEqual(parse("31-Dec-00", default=self.default),
                          datetime(2000, 12, 31))
 
     def testFuzzy(self):
-        s = "Today is 25 of September of 2003, exactly " \
+        s = "Today is 25 of September of 2003, exactly " +\
             "at 10:49:41 with timezone -03:00."
         self.assertEqual(parse(s, fuzzy=True),
                          datetime(2003, 9, 25, 10, 49, 41,
@@ -3675,6 +3675,13 @@ class EasterTest(unittest.TestCase):
             self.assertEqual(western,  easter(western.year,  EASTER_WESTERN))
             self.assertEqual(orthodox, easter(orthodox.year, EASTER_ORTHODOX))
 
+class FuzzyDatetimeTest(unittest.TestCase):
+
+    def testIgnoreDay(self):
+        all_of_jan_2011 = relativedelta(year=2011, month=1, months=+1)
+        self.assertEqual(parse('jan 2011', fuzzyreturn=True),
+                         all_of_jan_2011)
+
 class TZTest(unittest.TestCase):
 
     TZFILE_EST5EDT = """
@@ -3854,7 +3861,7 @@ END:VTIMEZONE
     def testStrCmp1(self):
         self.assertEqual(tzstr("EST5EDT"),
                          tzstr("EST5EDT4,M4.1.0/02:00:00,M10-5-0/02:00"))
-        
+
     def testStrCmp2(self):
         self.assertEqual(tzstr("EST5EDT"),
                          tzstr("EST5EDT,4,1,0,7200,10,-1,0,7200,3600"))
@@ -3877,7 +3884,7 @@ END:VTIMEZONE
         tz = tzfile(StringIO(base64.decodestring(self.TZFILE_EST5EDT)))
         self.assertEqual(datetime(2003,4,6,1,59,tzinfo=tz).tzname(), "EST")
         self.assertEqual(datetime(2003,4,6,2,00,tzinfo=tz).tzname(), "EDT")
-        
+
     def testFileEnd1(self):
         tz = tzfile(StringIO(base64.decodestring(self.TZFILE_EST5EDT)))
         self.assertEqual(datetime(2003,10,26,0,59,tzinfo=tz).tzname(), "EDT")

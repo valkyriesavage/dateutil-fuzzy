@@ -294,6 +294,7 @@ class parser(object):
 
     def parse(self, timestr, default=None,
                     ignoretz=False, tzinfos=None,
+                    fuzzyreturn=False,
                     **kwargs):
         if not default:
             default = datetime.datetime.now().replace(hour=0, minute=0,
@@ -332,6 +333,46 @@ class parser(object):
                 ret = ret.replace(tzinfo=tz.tzutc())
             elif res.tzoffset:
                 ret = ret.replace(tzinfo=tz.tzoffset(res.tzname, res.tzoffset))
+        if fuzzyreturn:
+            if not repl.has_key('month'):
+                # return a fuzzy answer: an object representing a whole year
+                return relativedelta.relativedelta(year=ret.year,
+                                                   years=+1)
+            elif not repl.has_key('day'):
+                # return a fuzzy answer: an object representing a whole month
+                return relativedelta.relativedelta(year=ret.year,
+                                                   month=ret.month,
+                                                   months=+1)
+            elif not repl.has_key('hour'):
+                # return a fuzzy answer: an object representing a whole day
+                return relativedelta.relativedelta(year=ret.year,
+                                                   month=ret.month,
+                                                   day=ret.day,
+                                                   days=+1)
+            elif not repl.has_key('minute'):
+                # return a fuzzy answer: an object representing a whole hour
+                return relativedelta.relativedelta(year=ret.year,
+                                                   month=ret.month,
+                                                   day=ret.day,
+                                                   hour=ret.hour,
+                                                   hours=+1)
+            elif not repl.has_key('second'):
+                # return a fuzzy answer: an object representing a whole minute
+                return relativedelta.relativedelta(year=ret.year,
+                                                   month=ret.month,
+                                                   day=ret.day,
+                                                   hour=ret.hour,
+                                                   minute=ret.minute,
+                                                   minutes=+1)
+            elif not repl.has_key('microsecond'):
+                # return a fuzzy answer: an object representing a whole second
+                return relativedelta.relativedelta(year=ret.year,
+                                                   month=ret.month,
+                                                   day=ret.day,
+                                                   hour=ret.hour,
+                                                   minute=ret.minute,
+                                                   second=ret.second,
+                                                   seconds=+1)
         return ret
 
     class _result(_resultbase):
@@ -865,7 +906,7 @@ class _tzparser(object):
 
         except (IndexError, ValueError, AssertionError):
             return None
-        
+
         return res
 
 
